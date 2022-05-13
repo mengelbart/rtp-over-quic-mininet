@@ -1,0 +1,3 @@
+[submodule "rtp-over-quic"]
+	path = rtp-over-quic
+	url = git@github.com:mengelbart/rtp-over-quic.git
