@@ -1,0 +1,34 @@
+{
+  "quic-scream-newreno-0": {
+    "description": "fails after bandwidth reduction",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "rtcp-feedback": "rfc8888"
+  },
+  "quic-scream-newreno-1": {
+    "description": "fix for congested feedback link",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "rtcp-feedback": "rfc8888"
+  },
+  "quic-scream-newreno-2": {
+    "description": "first fix for handling of 'isOkToTransmit' return value",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "rtcp-feedback": "rfc8888"
+  },
+  "quic-scream-newreno-3": {
+    "description": "second fix handling of 'isOkToTransmit' return value",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "rtcp-feedback": "rfc8888"
+  }
+}
