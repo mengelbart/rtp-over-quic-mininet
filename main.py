@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+import argparse
 import json
 import os
-from time import time, sleep
+from time import time, localtime, strftime
 from subprocess import TimeoutExpired
 from pathlib import Path
 from threading import Timer
@@ -20,6 +21,8 @@ class Implementation:
     sender_binary: str
     receiver_binary: str
     rtp_cc: str
+    scream_pacer: str
+    rfc8888mark: bool
     quic_cc: str
     rtcp_feedback: str
 
@@ -29,6 +32,8 @@ class Implementation:
                  sender_binary: str,
                  receiver_binary: str,
                  rtp_cc: str,
+                 scream_pacer: str,
+                 rfc8888mark: bool,
                  quic_cc: str,
                  rtcp_feedback: str,
                  ):
@@ -37,6 +42,8 @@ class Implementation:
         self.sender_binary = sender_binary
         self.receiver_binary = receiver_binary
         self.rtp_cc = rtp_cc
+        self.scream_pacer = scream_pacer
+        self.rfc8888mark = rfc8888mark
         self.quic_cc = quic_cc
         self.rtcp_feedback = rtcp_feedback
 
@@ -67,6 +74,7 @@ def run_test(implementation, src, dst, out_dir):
             '--addr', '{}:4242'.format(h1.IP()),
             '--sink', dst,
             '--rtcp-feedback', implementation.rtcp_feedback,
+            '--rfc8888-mark={}'.format(implementation.rfc8888mark),
             '--rtp-dump', '{}/receiver_rtp.log'.format(out_dir),
             '--rtcp-dump', '{}/receiver_rtcp.log'.format(out_dir),
             '--qlog', '{}'.format(out_dir),
@@ -77,6 +85,7 @@ def run_test(implementation, src, dst, out_dir):
             '--addr', '{}:4242'.format(h1.IP()),
             '--source', 'sintel.y4m',
             '--rtp-cc', implementation.rtp_cc,
+            '--scream-pacer', implementation.scream_pacer,
             '--quic-cc', implementation.quic_cc,
             '--rtp-dump', '{}/sender_rtp.log'.format(out_dir),
             '--rtcp-dump', '{}/sender_rtcp.log'.format(out_dir),
@@ -114,8 +123,7 @@ def run_test(implementation, src, dst, out_dir):
         except TimeoutExpired:
             pass
 
-        print('run until {}'.format(endTime))
-        sleep(120)
+        print('run until {}'.format(strftime('%X', localtime(endTime))))
         for h, line in pmonitor(popens, timeoutms=1000):
             t = time()
             if h:
@@ -142,6 +150,8 @@ def run_test(implementation, src, dst, out_dir):
         ok = False
     finally:
         print('stopping...')
+        t1.cancel()
+        t2.cancel()
         net.stop()
         return ok
 
@@ -155,33 +165,67 @@ def update_link(i1, i2, bw):
     return update
 
 
-if __name__ == "__main__":
-    setLogLevel('info')
-    # run_test()
+def main():
     with open('./implementations.json') as json_file:
         data = json.load(json_file)
 
-    src = 'sintel.y4m'
-    dst = 'output.y4m'
-    base_out_dir = 'data'
+    tests = [int(k) for k in data.keys()]
+
+    parser = argparse.ArgumentParser(
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
+    parser.add_argument('-t', '--tests', nargs='+', metavar='N', default=tests,
+                        help='test cases to run, list of keys from the dict'
+                             ' in the implementations file')
+    parser.add_argument('--implementations', default='implementations.json',
+                        help='JSON file containing a dictionary of names to'
+                             ' test implemnetations')
+    parser.add_argument('--loglevel', default='info', choices=['info'],
+                        help='log level for mininet')
+    parser.add_argument('--input', default='sintel.y4m', help='input video'
+                        ' file')
+    parser.add_argument('--output', default='output.y4m', help='output video'
+                        ' file')
+    parser.add_argument('--dir', default='data/', help='output directory'
+                        ' for logfiles')
+    args = parser.parse_args()
+
+    print(args)
+    setLogLevel(args.loglevel)
+
+    chosen_tests = [int(k) for k in args.tests]
+
+    src = args.input
+    dst = args.output
+    base_out_dir = args.dir
 
     count = 0
     for k, v in data.items():
-        # run_test(k, v)
+        if int(k) not in chosen_tests:
+            continue
+
         implementation = Implementation(
             k,
             v['description'],
             v['sender'],
             v['receiver'],
             v['rtp-cc'],
+            v['scream-pacer'],
+            v['rfc8888-mark'],
             v['quic-cc'],
             v['rtcp-feedback'],
         )
         out_dir = os.path.join(base_out_dir, k)
         ok = run_test(implementation, src, dst, out_dir)
         if not ok:
+            print('failed to run test: {}: {}, stopping execution'.format(k,
+                  v['name']))
             break
         count += 1
 
     print()
     print('finished {} out of {} test runs'.format(count, len(data)))
+
+
+if __name__ == "__main__":
+    main()
