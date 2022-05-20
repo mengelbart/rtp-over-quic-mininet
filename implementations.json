@@ -12,17 +12,6 @@
   },
   "1": {
     "name": "quic-scream-newreno-1",
-    "description": "fix congested feedback link by using Pions RFC 8888 implementation",
-    "sender": "./rtp-over-quic/rtp-over-quic",
-    "receiver": "./rtp-over-quic/rtp-over-quic",
-    "rtp-cc": "scream",
-    "scream-pacer": "0",
-    "rfc8888-mark": true,
-    "quic-cc": "newreno",
-    "rtcp-feedback": "rfc8888-pion"
-  },
-  "2": {
-    "name": "quic-scream-newreno-2",
     "description": "first fix for handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
@@ -32,8 +21,8 @@
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "3": {
-    "name": "quic-scream-newreno-3",
+  "2": {
+    "name": "quic-scream-newreno-2",
     "description": "second fix handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
@@ -43,8 +32,8 @@
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "4": {
-    "name": "quic-scream-newreno-4",
+  "3": {
+    "name": "quic-scream-newreno-3",
     "description": "fixes congested feedback bug",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
@@ -54,8 +43,8 @@
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "5": {
-    "name": "quic-scream-newreno-5",
+  "4": {
+    "name": "quic-scream-newreno-4",
     "description": "fixes congested feedback link and adds first fix for handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
@@ -65,8 +54,8 @@
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "6": {
-    "name": "quic-scream-newreno-6",
+  "5": {
+    "name": "quic-scream-newreno-5",
     "description": "fixes congested feedback link and adds second fix handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
