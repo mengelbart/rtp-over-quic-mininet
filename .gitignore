@@ -1,3 +1,4 @@
 *.png
 data*/
 *.y4m
+input/

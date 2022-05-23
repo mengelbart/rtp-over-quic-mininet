@@ -83,7 +83,7 @@ def run_test(implementation, src, dst, out_dir):
             implementation.sender_binary,
             'send',
             '--addr', '{}:4242'.format(h1.IP()),
-            '--source', 'sintel.y4m',
+            '--source', src,
             '--rtp-cc', implementation.rtp_cc,
             '--scream-pacer', implementation.scream_pacer,
             '--quic-cc', implementation.quic_cc,
@@ -182,7 +182,7 @@ def main():
                              ' test implemnetations')
     parser.add_argument('--loglevel', default='info', choices=['info'],
                         help='log level for mininet')
-    parser.add_argument('--input', default='sintel.y4m', help='input video'
+    parser.add_argument('--input', default='input.y4m', help='input video'
                         ' file')
     parser.add_argument('--output', default='output.y4m', help='output video'
                         ' file')
