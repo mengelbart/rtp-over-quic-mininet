@@ -1,68 +1,101 @@
-{
-  "0": {
+[
+  {
     "name": "quic-scream-newreno-0",
     "description": "fails after bandwidth reduction",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
     "rtp-cc": "scream",
     "scream-pacer": "0",
-    "rfc8888-mark": true,
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "1": {
+  {
     "name": "quic-scream-newreno-1",
     "description": "first fix for handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
     "rtp-cc": "scream",
     "scream-pacer": "1",
-    "rfc8888-mark": true,
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "2": {
+  {
     "name": "quic-scream-newreno-2",
     "description": "second fix handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
     "rtp-cc": "scream",
     "scream-pacer": "2",
-    "rfc8888-mark": true,
     "quic-cc": "newreno",
     "rtcp-feedback": "rfc8888"
   },
-  "3": {
-    "name": "quic-scream-newreno-3",
-    "description": "fixes congested feedback bug",
+  {
+    "name": "quic-scream-0",
+    "description": "fails after bandwidth reduction",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
     "rtp-cc": "scream",
     "scream-pacer": "0",
-    "rfc8888-mark": false,
-    "quic-cc": "newreno",
+    "quic-cc": "none",
     "rtcp-feedback": "rfc8888"
   },
-  "4": {
-    "name": "quic-scream-newreno-4",
-    "description": "fixes congested feedback link and adds first fix for handling of 'isOkToTransmit' return value",
+  {
+    "name": "quic-scream-1",
+    "description": "first fix for handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
     "rtp-cc": "scream",
     "scream-pacer": "1",
-    "rfc8888-mark": false,
-    "quic-cc": "newreno",
+    "quic-cc": "none",
     "rtcp-feedback": "rfc8888"
   },
-  "5": {
-    "name": "quic-scream-newreno-5",
-    "description": "fixes congested feedback link and adds second fix handling of 'isOkToTransmit' return value",
+  {
+    "name": "quic-scream-2",
+    "description": "second fix handling of 'isOkToTransmit' return value",
     "sender": "./rtp-over-quic/rtp-over-quic",
     "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
     "rtp-cc": "scream",
     "scream-pacer": "2",
-    "rfc8888-mark": false,
-    "quic-cc": "newreno",
+    "quic-cc": "none",
+    "rtcp-feedback": "rfc8888"
+  },
+  {
+    "name": "udp-scream-0",
+    "description": "fails after bandwidth reduction",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "udp",
+    "rtp-cc": "scream",
+    "scream-pacer": "0",
+    "quic-cc": "none",
+    "rtcp-feedback": "rfc8888"
+  },
+  {
+    "name": "udp-scream-1",
+    "description": "first fix for handling of 'isOkToTransmit' return value",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "udp",
+    "rtp-cc": "scream",
+    "scream-pacer": "1",
+    "quic-cc": "none",
+    "rtcp-feedback": "rfc8888"
+  },
+  {
+    "name": "udp-scream-2",
+    "description": "second fix handling of 'isOkToTransmit' return value",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "udp",
+    "rtp-cc": "scream",
+    "scream-pacer": "2",
+    "quic-cc": "none",
     "rtcp-feedback": "rfc8888"
   }
-}
+]
