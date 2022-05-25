@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import argparse
+import json
+
 import datetime as dt
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -15,6 +17,15 @@ def plotter(ax, data, params):
         }
     params = defaults | params
     out, = ax.plot(data, **params)
+    return out
+
+
+def stepper(ax, data, params):
+    defaults = {
+            'linewidth': 0.5,
+        }
+    params = defaults | params
+    out, = ax.step(data.index, data.values, where='post', **params)
     return out
 
 
@@ -50,6 +61,21 @@ def read_rtp(file, basetime):
     df.index = pd.to_datetime(df.index - basetime, unit='ms')
     df['rate'] = df['rate'].apply(lambda x: x * 8)
     df = df.resample('1s').sum()
+    return df
+
+
+def read_capacity(file, basetime):
+    df = pd.read_csv(
+            file,
+            index_col=0,
+            names=['time', 'bandwidth'],
+            header=None,
+            usecols=[0, 1],
+        )
+    if not basetime:
+        basetime = df.index[0]
+
+    df.index = pd.to_datetime(df.index - basetime, unit='ms')
     return df
 
 
@@ -106,6 +132,9 @@ def main():
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
     parser.add_argument('--name', default='', help='Plot name')
+    parser.add_argument('--config', default='', help='Use a config file to'
+                        ' read metadata such as the basetime')
+    parser.add_argument('--capacity', default='', help='Link capacity log')
     parser.add_argument('--rtp-sent', help='Senderside RTP logfile to include'
                         ' in plot')
     parser.add_argument('--rtp-received', help='Receiverside RTP logfile to'
@@ -124,11 +153,25 @@ def main():
                         ' data using the first row')
 
     args = parser.parse_args()
+
+    if args.config and not args.basetime:
+        with open(args.config) as f:
+            d = json.load(f)
+            args.basetime = d['basetime']
+
     print(args)
 
-    fig, ax = plt.subplots(figsize=(8, 4), dpi=400)
+    fig, ax = plt.subplots(figsize=(8, 2), dpi=400)
 
     labels = []
+    if args.capacity:
+        data = read_capacity(
+                args.capacity,
+                args.basetime,
+            )
+        labels.append(stepper(ax, data, {
+            'label': 'Link Capacity',
+            }))
     if args.rtp_sent:
         data = read_rtp(
                 args.rtp_sent,
