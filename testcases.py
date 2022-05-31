@@ -23,6 +23,7 @@ class Implementation:
     rtp_cc: str
     quic_cc: str
     rtcp_feedback: str
+    stream: bool
     out_dir: str
     input: str
     output: str
@@ -42,6 +43,7 @@ class Implementation:
                  rtp_cc: str,
                  quic_cc: str,
                  rtcp_feedback: str,
+                 stream: bool,
                  out_dir: str,
                  input: str,
                  output: str,
@@ -60,6 +62,7 @@ class Implementation:
         self.rtp_cc = rtp_cc
         self.quic_cc = quic_cc
         self.rtcp_feedback = rtcp_feedback
+        self.stream = stream
         self.out_dir = out_dir
         self.input = input
         self.output = output
@@ -85,6 +88,8 @@ class Implementation:
             '--rtp-cc', self.rtp_cc,
             '--quic-cc', self.quic_cc,
             ]
+        if self.stream:
+            cmd.append('--stream')
         if self.cpu_profile:
             cmd.append('--pprof-cpu')
             cmd.append('{}/sender_cpu.pprof'.format(self.out_dir))

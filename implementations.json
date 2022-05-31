@@ -10,6 +10,17 @@
     "rtcp-feedback": "rfc8888"
   },
   {
+    "name": "quic-scream-newreno-stream",
+    "description": "",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "rtcp-feedback": "rfc8888",
+    "stream": true
+  },
+  {
     "name": "quic-scream",
     "description": "",
     "sender": "./rtp-over-quic/rtp-over-quic",
