@@ -25,6 +25,7 @@ class Implementation:
     out_dir: str
     input: str
     output: str
+    cpu_profile: bool
 
     def __init__(self,
                  name: str,
@@ -39,6 +40,7 @@ class Implementation:
                  out_dir: str,
                  input: str,
                  output: str,
+                 cpu_profile: bool,
                  ):
         self.name = name
         self.description = description
@@ -52,9 +54,10 @@ class Implementation:
         self.out_dir = out_dir
         self.input = input
         self.output = output
+        self.cpu_profile = cpu_profile
 
     def send_cmd(self, addr, port) -> [str]:
-        return [
+        cmd = [
             self.sender_binary,
             'send',
             '--addr', '{}:{}'.format(addr, port),
@@ -63,24 +66,32 @@ class Implementation:
             '--rtcp-dump', '{}/sender_rtcp.log'.format(self.out_dir),
             '--cc-dump', '{}/cc.log'.format(self.out_dir),
             '--qlog', '{}'.format(self.out_dir),
+            '--transport', self.transport,
             '--rtp-cc', self.rtp_cc,
             '--scream-pacer', self.scream_pacer,
             '--quic-cc', self.quic_cc,
-            '--transport', self.transport,
             ]
+        if self.cpu_profile:
+            cmd.append('--pprof')
+            cmd.append('{}/sender_cpu.pprof'.format(self.out_dir))
+        return cmd
 
     def receive_cmd(self, addr, port) -> [str]:
-        return [
+        cmd = [
             self.receiver_binary,
             'receive',
             '--addr', '{}:{}'.format(addr, port),
             '--sink', self.output,
-            '--rtcp-feedback', self.rtcp_feedback,
             '--rtp-dump', '{}/receiver_rtp.log'.format(self.out_dir),
             '--rtcp-dump', '{}/receiver_rtcp.log'.format(self.out_dir),
             '--qlog', '{}'.format(self.out_dir),
             '--transport', self.transport,
+            '--rtcp-feedback', self.rtcp_feedback,
             ]
+        if self.cpu_profile:
+            cmd.append('--pprof')
+            cmd.append('{}/receiver_cpu.pprof'.format(self.out_dir))
+        return cmd
 
 
 def update_link(i1, i2, bw, log):

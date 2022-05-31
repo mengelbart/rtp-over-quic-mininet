@@ -33,6 +33,8 @@ def main():
                         ' file')
     parser.add_argument('--dir', default='data/', help='output directory'
                         ' for logfiles')
+    parser.add_argument('--pprof', action=argparse.BooleanOptionalAction,
+                        help='create CPU profiles')
     args = parser.parse_args()
 
     print(args)
@@ -63,6 +65,7 @@ def main():
             out_dir,
             src,
             dst,
+            args.pprof,
         )
         tc = VariableAvailableCapacitySingleFlow(implementation, out_dir)
         ok = tc.run()
