@@ -29,6 +29,16 @@ def stepper(ax, data, params):
     return out
 
 
+def scatter(ax, data, params):
+    defaults = {
+           's': 0.1,
+           'linewidths': 0.5,
+        }
+    params = defaults | params
+    out = ax.scatter(data.index, data.values, **params)
+    return out
+
+
 def read_rtcp(file, basetime):
     df = pd.read_csv(
             file,
@@ -79,7 +89,23 @@ def read_capacity(file, basetime):
     return df
 
 
-def read_cc(file, basetime):
+def read_cc_qdelay(file, basetime):
+    df = pd.read_csv(
+            file,
+            index_col=0,
+            names=['time', 'queue delay'],
+            header=None,
+            usecols=[0, 2]
+        )
+
+    if not basetime:
+        basetime = df.index[0]
+
+    df.index = pd.to_datetime(df.index - basetime, unit='ms')
+    return df
+
+
+def read_cc_target_rate(file, basetime):
     df = pd.read_csv(
             file,
             index_col=0,
@@ -92,7 +118,6 @@ def read_cc(file, basetime):
         basetime = df.index[0]
 
     df.index = pd.to_datetime(df.index - basetime, unit='ms')
-    # df = df.resample('1s').sum()
     return df
 
 
@@ -127,6 +152,33 @@ def read_rtp_loss(send_file, receive_file, basetime):
     return df
 
 
+def read_rtp_latency(send_file, receive_file, basetime):
+    df_send = pd.read_csv(
+            send_file,
+            index_col=1,
+            names=['time_send', 'nr'],
+            header=None,
+            usecols=[0, 8],
+        )
+    df_receive = pd.read_csv(
+            receive_file,
+            index_col=1,
+            names=['time_receive', 'nr'],
+            header=None,
+            usecols=[0, 8],
+        )
+
+    if not basetime:
+        basetime = df_send.index[0]
+
+    df = df_send.merge(df_receive, on='nr')
+    df['diff'] = (df['time_receive'] - df['time_send']) / 1000.0
+    df['time'] = pd.to_datetime(df['time_send'] - basetime, unit='ms')
+    df = df.drop(['time_send', 'time_receive', 'time'], axis=1)
+
+    return df
+
+
 def main():
     parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -145,8 +197,12 @@ def main():
                         ' include in plot')
     parser.add_argument('--cc', help='CC file to include in plot')
     parser.add_argument('--loss', nargs=2, help='plot loss between an RTP sent'
-                        'log file and an RTP received log file',
+                        ' log file and an RTP received log file',
                         metavar=('sent_rtp.log', 'received_rtp.log'))
+    parser.add_argument('--latency', nargs=2, help='RTP latency plot between'
+                        ' an RTP sent log file and an RTP received log file',
+                        metavar=('sent_rtp.log', 'received_rtp.log'))
+    parser.add_argument('--qdelay', help='SCReAM queue delay')
     parser.add_argument('-o', '--output', required=True, help='output file')
     parser.add_argument('-b', '--basetime', type=int, help='basetime to use in'
                         ' plots, if not given, will be inferred from the input'
@@ -209,7 +265,7 @@ def main():
         }))
 
     if args.cc:
-        data = read_cc(
+        data = read_cc_target_rate(
                 args.cc,
                 args.basetime,
             )
@@ -225,6 +281,25 @@ def main():
             )
         labels.append(plotter(ax, data, {
             'label': 'RTP loss',
+        }))
+
+    if args.latency:
+        data = read_rtp_latency(
+                args.latency[0],
+                args.latency[1],
+                args.basetime,
+            )
+        labels.append(scatter(ax, data, {
+            'label': 'RTP latency',
+            }))
+
+    if args.qdelay:
+        data = read_cc_qdelay(
+                args.qdelay,
+                args.basetime,
+            )
+        labels.append(plotter(ax, data, {
+            'label': 'SCReAM Queue Delay',
         }))
 
     if args.cc or args.rtp_sent or args.rtp_received:
