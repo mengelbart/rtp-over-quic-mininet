@@ -21,7 +21,6 @@ class Implementation:
     receiver_binary: str
     transport: str
     rtp_cc: str
-    scream_pacer: str
     quic_cc: str
     rtcp_feedback: str
     out_dir: str
@@ -41,7 +40,6 @@ class Implementation:
                  receiver_binary: str,
                  transport: str,
                  rtp_cc: str,
-                 scream_pacer: str,
                  quic_cc: str,
                  rtcp_feedback: str,
                  out_dir: str,
@@ -60,7 +58,6 @@ class Implementation:
         self.receiver_binary = receiver_binary
         self.transport = transport
         self.rtp_cc = rtp_cc
-        self.scream_pacer = scream_pacer
         self.quic_cc = quic_cc
         self.rtcp_feedback = rtcp_feedback
         self.out_dir = out_dir
@@ -86,7 +83,6 @@ class Implementation:
             '--qlog', '{}'.format(self.out_dir),
             '--transport', self.transport,
             '--rtp-cc', self.rtp_cc,
-            '--scream-pacer', self.scream_pacer,
             '--quic-cc', self.quic_cc,
             ]
         if self.cpu_profile:
