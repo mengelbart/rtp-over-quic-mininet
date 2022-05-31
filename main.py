@@ -33,8 +33,20 @@ def main():
                         ' file')
     parser.add_argument('--dir', default='data/', help='output directory'
                         ' for logfiles')
-    parser.add_argument('--pprof', action=argparse.BooleanOptionalAction,
+    parser.add_argument('--pprof-cpu', action=argparse.BooleanOptionalAction,
                         help='create CPU profiles')
+    parser.add_argument('--pprof-goroutine',
+                        action=argparse.BooleanOptionalAction,
+                        help='create goroutine profiles')
+    parser.add_argument('--pprof-heap', action=argparse.BooleanOptionalAction,
+                        help='create heap profiles')
+    parser.add_argument('--pprof-allocs',
+                        action=argparse.BooleanOptionalAction,
+                        help='create allocs profiles')
+    parser.add_argument('--pprof-block', action=argparse.BooleanOptionalAction,
+                        help='create block profiles')
+    parser.add_argument('--pprof-mutex', action=argparse.BooleanOptionalAction,
+                        help='create mutex profiles')
     args = parser.parse_args()
 
     print(args)
@@ -65,7 +77,12 @@ def main():
             out_dir,
             src,
             dst,
-            args.pprof,
+            args.pprof_cpu,
+            args.pprof_goroutine,
+            args.pprof_heap,
+            args.pprof_allocs,
+            args.pprof_block,
+            args.pprof_mutex,
         )
         tc = VariableAvailableCapacitySingleFlow(implementation, out_dir)
         ok = tc.run()

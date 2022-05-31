@@ -8,7 +8,6 @@ from time import time, localtime, strftime
 from threading import Timer
 
 from mininet.clean import cleanup
-from mininet.link import TCLink
 from mininet.net import Mininet
 from mininet.util import pmonitor, dumpNodeConnections
 
@@ -29,6 +28,11 @@ class Implementation:
     input: str
     output: str
     cpu_profile: bool
+    goroutine_profile: bool
+    heap_profile: bool
+    allocs_profile: bool
+    block_profile: bool
+    mutex_profile: bool
 
     def __init__(self,
                  name: str,
@@ -43,7 +47,12 @@ class Implementation:
                  out_dir: str,
                  input: str,
                  output: str,
-                 cpu_profile: bool,
+                 cpu_profile: bool = False,
+                 goroutine_profile: bool = False,
+                 heap_profile: bool = False,
+                 allocs_profile: bool = False,
+                 block_profile: bool = False,
+                 mutex_profile: bool = False,
                  ):
         self.name = name
         self.description = description
@@ -57,7 +66,13 @@ class Implementation:
         self.out_dir = out_dir
         self.input = input
         self.output = output
+
         self.cpu_profile = cpu_profile
+        self.goroutine_profile = goroutine_profile
+        self.heap_profile = heap_profile
+        self.allocs_profile = allocs_profile
+        self.block_profile = block_profile
+        self.mutex_profile = mutex_profile
 
     def send_cmd(self, addr, port) -> [str]:
         cmd = [
@@ -75,8 +90,23 @@ class Implementation:
             '--quic-cc', self.quic_cc,
             ]
         if self.cpu_profile:
-            cmd.append('--pprof')
+            cmd.append('--pprof-cpu')
             cmd.append('{}/sender_cpu.pprof'.format(self.out_dir))
+        if self.goroutine_profile:
+            cmd.append('--pprof-goroutine')
+            cmd.append('{}/sender_goroutine.pprof'.format(self.out_dir))
+        if self.heap_profile:
+            cmd.append('--pprof-heap')
+            cmd.append('{}/sender_heap.pprof'.format(self.out_dir))
+        if self.allocs_profile:
+            cmd.append('--pprof-allocs')
+            cmd.append('{}/sender_allocs.pprof'.format(self.out_dir))
+        if self.block_profile:
+            cmd.append('--pprof-block')
+            cmd.append('{}/sender_block.pprof'.format(self.out_dir))
+        if self.mutex_profile:
+            cmd.append('--pprof-mutex')
+            cmd.append('{}/sender_mutex.pprof'.format(self.out_dir))
         return cmd
 
     def receive_cmd(self, addr, port) -> [str]:
@@ -92,8 +122,23 @@ class Implementation:
             '--rtcp-feedback', self.rtcp_feedback,
             ]
         if self.cpu_profile:
-            cmd.append('--pprof')
+            cmd.append('--pprof-cpu')
             cmd.append('{}/receiver_cpu.pprof'.format(self.out_dir))
+        if self.goroutine_profile:
+            cmd.append('--pprof-goroutine')
+            cmd.append('{}/receiver_goroutine.pprof'.format(self.out_dir))
+        if self.heap_profile:
+            cmd.append('--pprof-heap')
+            cmd.append('{}/receiver_heap.pprof'.format(self.out_dir))
+        if self.allocs_profile:
+            cmd.append('--pprof-allocs')
+            cmd.append('{}/receiver_allocs.pprof'.format(self.out_dir))
+        if self.block_profile:
+            cmd.append('--pprof-block')
+            cmd.append('{}/receiver_block.pprof'.format(self.out_dir))
+        if self.mutex_profile:
+            cmd.append('--pprof-mutex')
+            cmd.append('{}/receiver_mutex.pprof'.format(self.out_dir))
         return cmd
 
 
