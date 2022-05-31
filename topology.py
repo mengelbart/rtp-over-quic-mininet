@@ -13,26 +13,10 @@ class SingleSwitchTopo(Topo):
 
 
 class DumbbellTopo(Topo):
-    def build(
-            self,
-            n=2,
-            bw=1,
-            delay='1ms',
-            loss=0,
-            latency_ms=300,
-            ):
-
+    def build(self, n=2):
         left_switch = self.addSwitch('ls1')
         right_switch = self.addSwitch('rs1')
-
-        self.addLink(
-                left_switch, right_switch,
-                bw=bw,
-                delay=delay,
-                loss=loss,
-                latency_ms=latency_ms,
-                use_tbf=True,
-                )
+        self.addLink(left_switch, right_switch)
 
         for h in range(n):
             left_host = self.addHost('l{}'.format(h), cpu=.5 / n)

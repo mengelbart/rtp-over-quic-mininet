@@ -1,10 +1,13 @@
 import json
 import os
+import subprocess
+
 from pathlib import Path
-from subprocess import TimeoutExpired
+from subprocess import TimeoutExpired, PIPE
 from time import time, localtime, strftime
 from threading import Timer
 
+from mininet.clean import cleanup
 from mininet.link import TCLink
 from mininet.net import Mininet
 from mininet.util import pmonitor, dumpNodeConnections
@@ -94,12 +97,27 @@ class Implementation:
         return cmd
 
 
-def update_link(i1, i2, bw, log):
+def update_link(i1, i2, bw, is_first, log):
     def update():
         print('found interfaces: {}, {}'.format(i1, i2))
         t = int(time() * 1000)
-        i1.config(bw=bw)
-        i2.config(bw=bw)
+        for i in [i1, i2]:
+            qdisc_cmd = 'tc qdisc {} dev {} root handle 1: tbf rate {}Mbit burst 15000 latency {}'.format(
+                        'add' if is_first else 'change',
+                        i,
+                        bw,
+                        '300ms',
+                    )
+            netem_cmd = 'tc qdisc {} dev {} parent 1: handle 2: netem delay {} loss {}'.format(
+                        'add' if is_first else 'change',
+                        i,
+                        '50ms',
+                        0,
+                    )
+            print('run cmd: {}'.format(qdisc_cmd))
+            print('run cmd: {}'.format(netem_cmd))
+            subprocess.run(qdisc_cmd.split(' '))
+            subprocess.run(netem_cmd.split(' '))
         with open(log, 'a') as f:
             f.write('{}, {}\n'.format(t, bw * 1_000_000))
 
@@ -122,15 +140,12 @@ class VariableAvailableCapacitySingleFlow():
 
     @staticmethod
     def net() -> Mininet:
-        # topo = SingleSwitchTopo(bw=1, delay='1ms', loss=0)
-        topo = DumbbellTopo(n=1, delay='50ms')
-        net = Mininet(topo=topo, link=TCLink, autoStaticArp=True)
-        print('--- dumpNodeConnections: ---')
+        topo = DumbbellTopo(n=1)
+        net = Mininet(topo=topo, autoStaticArp=True)
         dumpNodeConnections(net.hosts)
-        print('--- dumpNodeConnections: ---')
         return net
 
-    def start_traffic_control(self, h1, h2):
+    def start_traffic_control(self, s1, s2):
         reference = 1.0
         tc_config = [
                 {'start_time': 0, 'ratio': 1.0},
@@ -140,16 +155,19 @@ class VariableAvailableCapacitySingleFlow():
                 {'start_time': 100, 'ratio': 1.0},
                 ]
 
+        is_first = True
         for c in tc_config:
             t = Timer(
                     c['start_time'],
                     update_link(
-                        h1.defaultIntf(),
-                        h2.defaultIntf(),
+                        s1.intf('ls1-eth2'),
+                        s2.intf('rs1-eth2'),
                         c['ratio'] * reference,
+                        is_first,
                         os.path.join(self.out_dir, 'capacity.log'),
                         ),
                     )
+            is_first = False
             self.timers.append(t)
             t.start()
 
@@ -169,6 +187,7 @@ class VariableAvailableCapacitySingleFlow():
         net = self.net()
         net.start()
         h1, h2 = net.getNodeByName('l0', 'r0')
+        s1, s2 = net.getNodeByName('ls1', 'rs1')
         dumpNodeConnections(net.hosts)
 
         try:
@@ -180,48 +199,26 @@ class VariableAvailableCapacitySingleFlow():
             print('run until {}'.format(strftime('%X', localtime(endTime))))
 
             self.dump_config(start)
-            self.start_traffic_control(h1, h2)
+            self.start_traffic_control(s1, s2)
 
             send_cmd = self.implementation.receive_cmd(h1.IP(), "4242")
             receive_cmd = self.implementation.send_cmd(h1.IP(), "4242")
 
-            print(send_cmd)
-            print(receive_cmd)
+            print(' '.join(send_cmd))
+            print(' '.join(receive_cmd))
 
             popens = {}
-            popens[h1] = h1.popen(send_cmd)
-            popens[h2] = h2.popen(receive_cmd)
-
-            try:
-                out, err = popens[h1].communicate(timeout=1)
-                print(out)
-                print(err)
-            except TimeoutExpired:
-                pass
-            try:
-                out, err = popens[h2].communicate(timeout=1)
-                print(out)
-                print(err)
-            except TimeoutExpired:
-                pass
+            popens[h1] = h1.popen(send_cmd, stderr=PIPE, stdout=PIPE)
+            popens[h2] = h2.popen(receive_cmd, stderr=PIPE, stdout=PIPE)
 
             for h, line in pmonitor(popens, timeoutms=1000):
                 t = time()
                 if h:
-                    print('{}: {}: {}'.format(t, h.name, line))
+                    print('{}: {}: {}'.format(int(t * 1000), h.name, line))
                 if t >= endTime:
                     print('time over')
                     break
 
-            for p in popens.values():
-                p.terminate()
-                try:
-                    print('waiting for {}'.format(p))
-                    p.wait(3)
-                    print('wait done')
-                except TimeoutExpired:
-                    p.kill()
-                    print('killed {}'.format(p))
             ok = True
 
         except (KeyboardInterrupt, Exception) as e:
@@ -232,6 +229,16 @@ class VariableAvailableCapacitySingleFlow():
             ok = False
         finally:
             print('stopping...')
+            for p in popens.values():
+                p.terminate()
+                try:
+                    print('waiting for {}'.format(p))
+                    p.wait(3)
+                    print('wait done')
+                except TimeoutExpired:
+                    p.kill()
+                    print('killed {}'.format(p))
             net.stop()
             self.stop_traffic_control()
+            cleanup()
             return ok
