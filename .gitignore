@@ -2,3 +2,4 @@
 data*/
 *.y4m
 input/
+__pycache__/
