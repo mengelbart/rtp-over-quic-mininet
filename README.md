@@ -12,9 +12,10 @@ It uses [SCReAM](https://github.com/EricssonResearch/scream/) as real-time media
 ## Running
 
 1. Make sure to install Mininet, Gstreamer, Golang and a C/C++ Compiler.
-2. Build RTP over QUIC: `cd` into the `rtp-over-quic` directory and run `go build`
-3. Run `./main.py` (use `-h` for a list of options) (this will run the tests and create various logfiles in `data/`)
-4. Run `./plot.py` (use `-h` for al ist of options) or `./plot.sh` to visualize the results.
+2. Pull Git submodules.
+3. Build RTP over QUIC: `cd` into the `rtp-over-quic` directory and run `go build`
+4. Run `./main.py` (use `-h` for a list of options) (this will run the tests and create various logfiles in `data/`)
+5. Run `./plot.py` (use `-h` for al ist of options) or `./plot.sh` to visualize the results.
 
 If you want to configure different tests, check out the `implementations.json` file.
 
