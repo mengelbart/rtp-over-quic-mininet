@@ -23,6 +23,7 @@ class Implementation:
     rtp_cc: str
     quic_cc: str
     rtcp_feedback: str
+    sender_rfc8888: bool
     stream: bool
     out_dir: str
     input: str
@@ -43,6 +44,7 @@ class Implementation:
                  rtp_cc: str,
                  quic_cc: str,
                  rtcp_feedback: str,
+                 sender_rfc8888: bool,
                  stream: bool,
                  out_dir: str,
                  input: str,
@@ -62,6 +64,7 @@ class Implementation:
         self.rtp_cc = rtp_cc
         self.quic_cc = quic_cc
         self.rtcp_feedback = rtcp_feedback
+        self.sender_rfc8888 = sender_rfc8888
         self.stream = stream
         self.out_dir = out_dir
         self.input = input
@@ -90,6 +93,8 @@ class Implementation:
             ]
         if self.stream:
             cmd.append('--stream')
+        if self.sender_rfc8888:
+            cmd.append('--local-rfc8888')
         if self.cpu_profile:
             cmd.append('--pprof-cpu')
             cmd.append('{}/sender_cpu.pprof'.format(self.out_dir))

@@ -31,6 +31,37 @@
     "rtcp-feedback": "rfc8888"
   },
   {
+    "name": "quic-scream-newreno-localrfc8888",
+    "description": "",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "sender-rfc8888": true
+  },
+  {
+    "name": "quic-scream-newreno-stream-localrfc8888",
+    "description": "",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
+    "rtp-cc": "scream",
+    "quic-cc": "newreno",
+    "sender-rfc8888": true,
+    "stream": true
+  },
+  {
+    "name": "quic-scream-localrfc8888",
+    "description": "",
+    "sender": "./rtp-over-quic/rtp-over-quic",
+    "receiver": "./rtp-over-quic/rtp-over-quic",
+    "transport": "quic",
+    "rtp-cc": "scream",
+    "quic-cc": "none",
+    "sender-rfc8888": true
+  },
+  {
     "name": "udp-scream",
     "description": "",
     "sender": "./rtp-over-quic/rtp-over-quic",
