@@ -25,18 +25,24 @@ Here are some sample results for the four default configurations.
 All tests use QUIC Datagrams to send RTP packets.
 The test uses a sequence from [Sintel](https://en.wikipedia.org/wiki/Sintel).
 
+### UDP + SCReAM
+
+Sends RTP over UDP using SCReAM for reference/comparison with QUIC.
+
+![UDP-SCReAM](plots/6_rates.png)
+
 ### QUIC + SCReAM
 
 Use SCReAM congestion control for RTP.
 SCReAM runs at the application layer, QUIC's congestion control is disabled.
 
-![QUIC-SCReAM](plots/0_rates.png)
+![QUIC-SCReAM](plots/2_rates.png)
 
 ### QUIC + SCReAM + NewReno
 
 Use SCReAM congestion control for RTP. SCReAM runs at the application layer and QUIC's NewReno congestion control is enabled.
 
-![QUIC-SCReAM-NewReno](plots/2_rates.png)
+![QUIC-SCReAM-NewReno](plots/0_rates.png)
 
 ### QUIC + SCReAM + NewReno + Stream
 
@@ -47,8 +53,28 @@ The data sent on the stream is only congestion controlled by the same NewReno co
 
 ![QUIC-SCReAM-NewReno-Stream](plots/1_rates.png)
 
-### UDP + SCReAM
+### QUIC + SCReAM + No RTCP
 
-Sends RTP over UDP using SCReAM for reference/comparison with QUIC.
+Use SCReAM congestion control for RTP.
+SCReAM runs at the application layer, QUIC's congestion control is disabled.
+Instead of using RTCP, congestion control feedback is collected from QUIC connection statistics.
 
-![UDP-SCReAM](plots/3_rates.png)
+![QUIC-SCReAM](plots/5_rates.png)
+
+### QUIC + SCReAM + NewReno + No RTCP
+
+Use SCReAM congestion control for RTP. SCReAM runs at the application layer and QUIC's NewReno congestion control is enabled.
+Instead of using RTCP, congestion control feedback is collected from QUIC connection statistics.
+
+![QUIC-SCReAM-NewReno](plots/3_rates.png)
+
+### QUIC + SCReAM + NewReno + Stream + No RTCP
+
+Use SCReAM congestion control for RTP.
+SCReAM runs at the application layer and QUIC's NewReno congestion control is enabled.
+Next to sending the RTP Datagrams, the application also opens a QUIC stream to send.
+The data sent on the stream is only congestion controlled by the same NewReno controller.
+Instead of using RTCP, congestion control feedback is collected from QUIC connection statistics.
+
+![QUIC-SCReAM-NewReno-Stream](plots/4_rates.png)
+
